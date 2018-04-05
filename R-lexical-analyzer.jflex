@@ -33,9 +33,6 @@ comments = #.*
 {string_literal} { printMatch(yytext(),yyline,yycolumn,"string_literal");}
 {integer_literal} { printMatch(yytext(),yyline,yycolumn,"integer_literal");}
 {float_literal} { printMatch(yytext(),yyline,yycolumn,"float_literal");}
-// {arith_operators} { printMatch(yytext(),yyline,yycolumn); System.out.println("  ===> arith_operators");}
-// {logic_operators} { printMatch(yytext(),yyline,yycolumn); System.out.println("  ===> logic_operators");}
-// {assignment_operators} { printMatch(yytext(),yyline,yycolumn); System.out.println("  ===> assignment_operators");}
 {operators} { printMatch(yytext(),yyline,yycolumn,"operators");}
 {comments} { printMatch(yytext(),yyline,yycolumn,"comments");}
 {delimiters} { printMatch(yytext(),yyline,yycolumn,"delimiters");}
