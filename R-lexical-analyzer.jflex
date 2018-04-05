@@ -15,8 +15,8 @@ identifier = [a-zA-Z_][\w.]*|\.[a-zA-Z_][\w.]*
 integer_literal = [+-]?[1-9][0-9]*[lL]?|0[xX][0-9a-fA-F]+
 float_literal = [+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)
 delimiters = [(){}<>[]]
-arith_operators = %\/%|[+\-*/\^]|%[*/xo]?(in)?%
-logic_operators = <=|>=|==|\!=|>|<|\!|&[&]?|\|[\|]?|:|\?|~|\$
+arith_operators =   [+\-*/\^]|%[*/o]?%|%{identifier}%
+logic_operators = <=|>=|==|\!=|>|<|\!|&[&]?|\|[\|]?|:|\?|\~|\$
 assignment_operators = =|->[>]?|<[<]?-
 operators = {logic_operators}|{arith_operators}|{assignment_operators}
 comments = #.*
