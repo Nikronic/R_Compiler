@@ -1,1 +1,3 @@
-/RLexicalAnalyzer.java
+*.java
+*.java~
+*.class
