@@ -22,7 +22,7 @@ operators = {logic_operators}|{arith_operators}|{assignment_operators}
 comments = #.*
 %{
     public void printMatch(String text,int line,int column,String type) {
-         System.out.printf("Found match %s , at line %d, column %d ===> %s",
+         System.out.printf("Found match %s , at line %d, column %d ===> %s\n",
          text,line,column,type);
     }
 %}
