@@ -1,4 +1,4 @@
-/* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
+/* A simple CUP parser based on JFlex lexer for R language.*/
 import java_cup.runtime.*;
 
 parser code {:
@@ -12,7 +12,8 @@ init with {: s.init(); :};
 scan with {: return s.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, WHILE, READ, WRITE, BUNOP, ASSIGN; // read and write should be changed by our defined symbol.
+terminal COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, WHILE, READ, WRITE, BUNOP, ASSIGN; 
+// read and write should be changed by our defined symbol.
 terminal BINOP, UNOP, COMP, BBINOP, INTCONST;
 terminal IDENT,STRINGCONST;
 terminal BOOLCONST;
@@ -24,15 +25,15 @@ precedence left ELSE, UNOP, BINOP, BUNOP, BBINOP;
 program   ::=  decllist:d stmtlist:s
     ;
 decllist  ::=  decl:d decllist:dl
-    | /* empty */
+    // | /* empty */
     ;
 stmtlist  ::= stmtlist:sl stmt:s
-    | /* empty */
+    // | /* empty */
         ;
 decl ::=  IDENT:identifier identlist:il
     ;
 identlist  ::= identlist:il COMMA IDENT:identifier
-    | /* empty */
+    // | /* empty */
     ;
 stmt ::= BEGIN stmtlist:sl END
     | IDENT:lhs ASSIGN expr:rhs
