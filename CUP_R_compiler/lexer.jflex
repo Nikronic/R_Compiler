@@ -1,6 +1,10 @@
-import java_cup.runtime.Symbol;
+package cup.example;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.Location;
+import java_cup.runtime.Symbol;
+import java.lang.*;
+import java.io.InputStreamReader;
+
 
 
 %%
@@ -9,7 +13,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 %line
 %cup
 %char
-%extends sym, minijava.Constants
+%implements sym
 %column
 // %standalone
 
@@ -70,7 +74,7 @@ comments = #.*
 "{" { return symbol("{",BEGIN); }
 "}" { return symbol("}",END); }
 "<-" { return symbol("<-",ASSIGN); }
-"+" { return symbol("plus",BINOP, new Integer( PLUS ) ); }
+"+" { return symbol("plus",BINOP, new Integer( 	 ) ); }
 "-" { return symbol("minus",BINOP, new Integer( MINUS ) ); }
 "*" { return symbol("mult",BINOP, new Integer( MULT ) ); }
 "/" { return symbol("div",BINOP, new Integer( DIV ) ); }
@@ -93,14 +97,14 @@ comments = #.*
 // {delimiters} { printMatch(yytext(),yyline,yycolumn,"delimiters");}
 {whitespace} { }
 
-/* names */
-{Ident}           { return symbol("Identifier",IDENT, yytext()); }
+// /* names */
+// {Ident}           { return symbol("Identifier",IDENT, yytext()); }
 
-/* bool literal */
-{BoolLiteral} { return symbol("Boolconst",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
+// /* bool literal */
+// {BoolLiteral} { return symbol("Boolconst",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
 
 /* literals */
-{IntLiteral} { return symbol("Intconst",INTCONST, new Integer(Integer.parseInt(yytext()))); }
+//{IntLiteral} { return symbol("Intconst",INTCONST, new Integer(Integer.parseInt(yytext()))); }
 // {whitespace} { printMatch(yytext(),yyline,yycolumn,"whitespace");}
 
 /* error fallback */

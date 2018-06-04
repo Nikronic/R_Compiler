@@ -1,0 +1,84 @@
+/* A simple CUP parser based on JFlex lexer for R language.*/
+/*
+    DEVELOPERS :
+    https://github.com/Nikronic, https://github.com/erfanMhi
+
+*/
+
+package cup.example;
+
+/* importing CUP library */
+import java_cup.runtime.*;
+import cup.example.Lexer;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+
+/* Connect this parser to a scanner! */
+parser code {:
+  protected Lexer lexer;
+:}
+
+/* define how to connect to the scanner! */
+init with {:
+  ComplexSymbolFactory f = new ComplexSymbolFactory();
+  symbolFactory = f;
+  File file = new File("input.txt");
+  FileInputStream fis = null;
+  try {
+    fis = new FileInputStream(file);
+  } catch (IOException e) {
+    e.printStackTrace();
+  } 
+  lexer = new Lexer(f,fis);
+:};
+scan with {: return lexer.next_token(); :};
+
+/* Terminals (tokens returned by the scanner). */
+terminal COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, WHILE, READ, WRITE, BUNOP, ASSIGN; 
+        // read and write should be changed by our defined symbol.
+terminal BINOP, UNOP, COMP, BBINOP, INTCONST;
+terminal IDENT,STRINGCONST;
+terminal BOOLCONST;
+
+/* Nonterminals (other terms to reach to Terminals). */
+non terminal program, decllist,decl,stmtlist,identlist,stmt,expr,cond;
+
+/* Defining precedence on grammers for terminating all reduce-reduce or shift-reduce problems. */
+precedence left ELSE, UNOP, BINOP, BUNOP, BBINOP;
+
+program   ::=  decllist:d stmtlist:s
+    ;
+decllist  ::=  decl:d decllist:dl
+    // | /* empty */
+    ;
+stmtlist  ::= stmtlist:sl stmt:s
+    // | /* empty */
+        ;
+decl ::=  IDENT:identifier identlist:il
+    ;
+identlist  ::= identlist:il COMMA IDENT:identifier
+    // | /* empty */
+    ;
+stmt ::= BEGIN stmtlist:sl END
+    | IDENT:lhs ASSIGN expr:rhs
+    | IDENT:lhs ASSIGN READ LPAR RPAR
+    | IDENT:lhs ASSIGN READ LPAR STRINGCONST:s RPAR
+    | WRITE LPAR expr:e RPAR
+    | WRITE LPAR STRINGCONST:s RPAR
+    | IF LPAR cond:c RPAR stmt:s
+    | IF LPAR cond:c RPAR stmt:t ELSE stmt:e
+    | WHILE LPAR cond:c RPAR stmt:s
+    ;
+cond ::= BOOLCONST:c
+    | LPAR cond:c RPAR
+    | expr:e1 COMP:op expr:e2
+    | BUNOP cond:c
+    | cond:c1 BBINOP:op cond:c2
+    ;
+expr ::= IDENT:identifier
+    | INTCONST:constant
+    | LPAR expr:e RPAR
+    | BINOP expr:e
+    | expr:e1 BINOP:op expr:e2
+    ;
