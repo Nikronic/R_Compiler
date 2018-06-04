@@ -1,8 +1,15 @@
 /* A simple CUP parser based on JFlex lexer for R language.*/
+/*
+    DEVELOPERS :
+    https://github.com/Nikronic, https://github.com/erfanMhi
+
+*/
+
+/* importing CUP library */
 import java_cup.runtime.*;
 
+/* Connect this parser to a scanner! */
 parser code {:
-    // Connect this parser to a scanner!
     scanner s;
     Parser(scanner s){ this.s=s; }
 :}
@@ -13,13 +20,15 @@ scan with {: return s.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
 terminal COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, WHILE, READ, WRITE, BUNOP, ASSIGN; 
-// read and write should be changed by our defined symbol.
+        // read and write should be changed by our defined symbol.
 terminal BINOP, UNOP, COMP, BBINOP, INTCONST;
 terminal IDENT,STRINGCONST;
 terminal BOOLCONST;
 
+/* Nonterminals (other terms to reach to Terminals). */
 non terminal program, decllist,decl,stmtlist,identlist,stmt,expr,cond;
 
+/* Defining precedence on grammers for terminating all reduce-reduce or shift-reduce problems. */
 precedence left ELSE, UNOP, BINOP, BUNOP, BBINOP;
 
 program   ::=  decllist:d stmtlist:s
