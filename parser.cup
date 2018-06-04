@@ -12,27 +12,47 @@ init with {: s.init(); :};
 scan with {: return s.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal            SEMI, PLUS, MINUS, TIMES, UMINUS, LPAREN, RPAREN;
-terminal Integer    NUMBER;        // our scanner provides numbers as integers
+terminal COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, WHILE, READ, WRITE, BUNOP, ASSIGN; // read and write should be changed by our defined symbol.
+terminal BINOP, UNOP, COMP, BBINOP, INTCONST;
+terminal IDENT,STRINGCONST;
+terminal BOOLCONST;
 
-/* Non terminals */
-non terminal            expr_list;
-non terminal Integer    expr;      // used to store evaluated subexpressions
+non terminal program, decllist,decl,stmtlist,identlist,stmt,expr,cond;
 
-/* Precedences */
-precedence left PLUS, MINUS;
-precedence left TIMES;
-precedence left UMINUS;
+precedence left ELSE, UNOP, BINOP, BUNOP, BBINOP;
 
-/* The grammar rules */
-expr_list ::= expr_list expr:e SEMI         {: System.out.println(e);:}
-            | expr:e SEMI                   {: System.out.println(e);:}
-;
-expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1+e2;       :}
-             | expr:e1 MINUS expr:e2        {: RESULT = e1-e2;       :}
-             | expr:e1 TIMES expr:e2        {: RESULT = e1*e2;       :}
-             | MINUS expr:e                 {: RESULT = -e;          :}
-  	     %prec UMINUS
-       | LPAREN expr:e RPAREN	         {: RESULT = e;           :}
-       | NUMBER:n	                     {: RESULT = n;           :}
-             ;
+program   ::=  decllist:d stmtlist:s
+    ;
+decllist  ::=  decl:d decllist:dl
+    | /* empty */
+    ;
+stmtlist  ::= stmtlist:sl stmt:s
+    | /* empty */
+        ;
+decl ::=  IDENT:identifier identlist:il
+    ;
+identlist  ::= identlist:il COMMA IDENT:identifier
+    | /* empty */
+    ;
+stmt ::= BEGIN stmtlist:sl END
+    | IDENT:lhs ASSIGN expr:rhs
+    | IDENT:lhs ASSIGN READ LPAR RPAR
+    | IDENT:lhs ASSIGN READ LPAR STRINGCONST:s RPAR
+    | WRITE LPAR expr:e RPAR
+    | WRITE LPAR STRINGCONST:s RPAR
+    | IF LPAR cond:c RPAR stmt:s
+    | IF LPAR cond:c RPAR stmt:t ELSE stmt:e
+    | WHILE LPAR cond:c RPAR stmt:s
+    ;
+cond ::= BOOLCONST:c
+    | LPAR cond:c RPAR
+    | expr:e1 COMP:op expr:e2
+    | BUNOP cond:c
+    | cond:c1 BBINOP:op cond:c2
+    ;
+expr ::= IDENT:identifier
+    | INTCONST:constant
+    | LPAR expr:e RPAR
+    | BINOP expr:e
+    | expr:e1 BINOP:op expr:e2
+    ;
