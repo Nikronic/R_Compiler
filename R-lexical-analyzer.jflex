@@ -17,10 +17,11 @@ new_line = \r|\n|\r\n;
 white_space = {new_line} | [ \t\f]
 whitespace = [\n\t]+
 // keywords = if|array|list|library|while|function
-string_literal = \"([^\"])*\" //   (\")(.)*?(\") // ([""])(.)*?\1
+// string_literal = \"([^\"])*\" //   (\")(.)*?(\") // ([""])(.)*?\1
 identifier = [a-zA-Z_][\w.]*|\.[a-zA-Z_][\w.]*
 integer_literal = [+-]?[1-9][0-9]*[lL]?|0[xX][0-9a-fA-F]+
-float_literal = [+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)
+bool_literal=TRUE|FALSE
+// float_literal = [+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)
 // delimiters = [(){}<>[]]
 // arith_operators =   [+\-*/\^]|%[*/o]?%|%{identifier}%
 // logic_operators = <=|>=|==|\!=|>|<|\!|&[&]?|\|[\|]?|:|\?|\~|\$
@@ -59,6 +60,8 @@ comments = #.*
 %eofval}
 
 %%
+
+
 "if" { return symbol("if",IF); }
 "else" { return symbol("else",ELSE); }
 "for" { return symbol("for",FOR); }
@@ -87,23 +90,18 @@ comments = #.*
 {identifier} { return symbol("Identifier",IDENT, yytext()); }
 // {string_literal} { printMatch(yytext(),yyline,yycolumn,"string_literal");}
 {integer_literal} { return symbol("Intconst",INTCONST, new Integer(Integer.parseInt(yytext()))); }
-{float_literal} { return symbol("Floatconst",FLOATCONST, new Integer(Float.parseFloat(yytext()))); }
+// {float_literal} { return symbol("Floatconst",FLOATCONST, new Integer(Float.parseFloat(yytext()))); }
 // {operators} { printMatch(yytext(),yyline,yycolumn,"operators");}
 {comments} { return symbol("Comments",COMMENTS);}
 // {delimiters} { printMatch(yytext(),yyline,yycolumn,"delimiters");}
-{whitespace} { }
-
-/* names */
-{Ident}           { return symbol("Identifier",IDENT, yytext()); }
 
 /* bool literal */
-{BoolLiteral} { return symbol("Boolconst",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
+{bool_literal} { return symbol("Boolconst",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
 
 /* literals */
-{IntLiteral} { return symbol("Intconst",INTCONST, new Integer(Integer.parseInt(yytext()))); }
 // {whitespace} { printMatch(yytext(),yyline,yycolumn,"whitespace");}
-
+{whitespace} { }
 /* error fallback */
-.|\n {  /* throw new Error("Illegal character <"+ yytext()+">");*/
-		    error("Illegal character <"+ yytext()+">");
-     }
+// .|\n {  /* throw new Error("Illegal character <"+ yytext()+">");*/
+// 		    error("Illegal character <"+ yytext()+">");
+//      }
