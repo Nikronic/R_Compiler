@@ -11,7 +11,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
  * <a href="http://www.jflex.de/">JFlex</a> 1.6.1
  * from the specification file <tt>./R-lexical-analyzer.jflex</tt>
  */
-class lexer implements java_cup.runtime.Scanner, sym, minijava.Constants {
+class Lexer implements java_cup.runtime.Scanner, sym, minijava.Constants {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -421,7 +421,7 @@ class lexer implements java_cup.runtime.Scanner, sym, minijava.Constants {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  lexer(java.io.Reader in) {
+  Lexer(java.io.Reader in) {
     this.zzReader = in;
   }
 

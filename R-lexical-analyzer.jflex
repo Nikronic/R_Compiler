@@ -5,7 +5,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 
 %%
 
-%class lexer
+%class Lexer
 %line
 %cup
 %char
