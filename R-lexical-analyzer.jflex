@@ -5,7 +5,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 
 %%
 
-%class Lexer
+%class Scanner
 %line
 %cup
 %char
@@ -61,46 +61,48 @@ comments = #.*
 
 %%
 
+<YYINITIAL>{
+    "if" { return symbol("if",IF); }
+    "else" { return symbol("else",ELSE); }
+    "while" { return symbol("while",WHILE); }
+    "function" { return symbol("function",FUNCTION); }
+    ";" { return symbol("semicolon",SEMICOLON); }
+    "," { return symbol("comma",COMMA); }
+    "(" { return symbol("(",LPAR); }
+    ")" { return symbol(")",RPAR); }
+    "{" { return symbol("{",BEGIN); }
+    "}" { return symbol("}",END); }
+    "<-" { return symbol("<-",ASSIGN); }
+    "+" { return symbol("plus",BINOP, new Integer( PLUS ) ); }
+    "-" { return symbol("minus",BINOP, new Integer( MINUS ) ); }
+    "*" { return symbol("mult",BINOP, new Integer( MULT ) ); }
+    "/" { return symbol("div",BINOP, new Integer( DIV ) ); }
+    "<=" { return symbol("leq",COMP,  new Integer( LEQ ) ); }
+    ">=" { return symbol("gtq",COMP,  new Integer( GTQ ) ); }
+    "==" { return symbol("eq",COMP,  new Integer( EQ  ) ); }
+    "!=" { return symbol("neq",COMP,  new Integer( NEQ ) ); }
+    "<"  { return symbol("le",COMP,  new Integer( LE  ) ); }
+    ">"  { return symbol("gt",COMP,  new Integer( GT  ) ); }
+    "&&" { return symbol("and",BBINOP,new Integer( AND ) ); }
+    "||" { return symbol("or",BBINOP,new Integer( OR  ) ); }
+    "!"  { return symbol("not",BUNOP); }
+    // {keywords} { printMatch(yytext(),yyline,yycolumn,"keyword");}
+    {identifier} { return symbol("Identifier",IDENT, yytext()); }
+    // {string_literal} { printMatch(yytext(),yyline,yycolumn,"string_literal");}
+    {integer_literal} { return symbol("Intconst",INTCONST, new Integer(Integer.parseInt(yytext()))); }
+    // {float_literal} { return symbol("Floatconst",FLOATCONST, new Integer(Float.parseFloat(yytext()))); }
+    // {operators} { printMatch(yytext(),yyline,yycolumn,"operators");}
+    {comments} { return symbol("Comments",COMMENTS);}
+    // {delimiters} { printMatch(yytext(),yyline,yycolumn,"delimiters");}
+    /* bool literal */
+    {bool_literal} { return symbol("Boolconst",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
 
-"if" { return symbol("if",IF); }
-"else" { return symbol("else",ELSE); }
-"for" { return symbol("for",FOR); }
-"function" { return symbol("function",FUNCTION); }
-";" { return symbol("semicolon",SEMICOLON); }
-"," { return symbol("comma",COMMA); }
-"(" { return symbol("(",LPAR); }
-")" { return symbol(")",RPAR); }
-"{" { return symbol("{",BEGIN); }
-"}" { return symbol("}",END); }
-"<-" { return symbol("<-",ASSIGN); }
-"+" { return symbol("plus",BINOP, new Integer( PLUS ) ); }
-"-" { return symbol("minus",BINOP, new Integer( MINUS ) ); }
-"*" { return symbol("mult",BINOP, new Integer( MULT ) ); }
-"/" { return symbol("div",BINOP, new Integer( DIV ) ); }
-"<=" { return symbol("leq",COMP,  new Integer( LEQ ) ); }
-">=" { return symbol("gtq",COMP,  new Integer( GTQ ) ); }
-"==" { return symbol("eq",COMP,  new Integer( EQ  ) ); }
-"!=" { return symbol("neq",COMP,  new Integer( NEQ ) ); }
-"<"  { return symbol("le",COMP,  new Integer( LE  ) ); }
-">"  { return symbol("gt",COMP,  new Integer( GT  ) ); }
-"&&" { return symbol("and",BBINOP,new Integer( AND ) ); }
-"||" { return symbol("or",BBINOP,new Integer( OR  ) ); }
-"!"  { return symbol("not",BUNOP); }
-// {keywords} { printMatch(yytext(),yyline,yycolumn,"keyword");}
-{identifier} { return symbol("Identifier",IDENT, yytext()); }
-// {string_literal} { printMatch(yytext(),yyline,yycolumn,"string_literal");}
-{integer_literal} { return symbol("Intconst",INTCONST, new Integer(Integer.parseInt(yytext()))); }
-// {float_literal} { return symbol("Floatconst",FLOATCONST, new Integer(Float.parseFloat(yytext()))); }
-// {operators} { printMatch(yytext(),yyline,yycolumn,"operators");}
-{comments} { return symbol("Comments",COMMENTS);}
-// {delimiters} { printMatch(yytext(),yyline,yycolumn,"delimiters");}
+    /* literals */
+    // {whitespace} { printMatch(yytext(),yyline,yycolumn,"whitespace");}
+    {whitespace} { }
+}
 
-/* bool literal */
-{bool_literal} { return symbol("Boolconst",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
 
-/* literals */
-// {whitespace} { printMatch(yytext(),yyline,yycolumn,"whitespace");}
-{whitespace} { }
 /* error fallback */
 // .|\n {  /* throw new Error("Illegal character <"+ yytext()+">");*/
 // 		    error("Illegal character <"+ yytext()+">");
