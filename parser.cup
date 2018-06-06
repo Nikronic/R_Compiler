@@ -5,64 +5,131 @@
 
 */
 
+package cup.example;
+
 /* importing CUP library */
 import java_cup.runtime.*;
+import cup.example.Lexer;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 
 /* Connect this parser to a scanner! */
 parser code {:
-    scanner s;
-    Parser(scanner s){ this.s=s; }
+  protected Lexer lexer;
 :}
 
 /* define how to connect to the scanner! */
-init with {: s.init(); :};
-scan with {: return s.next_token(); :};
+init with {:
+  ComplexSymbolFactory f = new ComplexSymbolFactory();
+  symbolFactory = f;
+  File file = new File("input.txt");
+  FileInputStream fis = null;
+  try {
+    fis = new FileInputStream(file);
+  } catch (IOException e) {
+    e.printStackTrace();
+  } 
+  lexer = new Lexer(f,fis);
+:};
+scan with {: return lexer.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, WHILE, READ, WRITE, BUNOP, ASSIGN; 
-        // read and write should be changed by our defined symbol.
-terminal BINOP, UNOP, COMP, BBINOP, INTCONST;
-terminal IDENT,STRINGCONST;
-terminal BOOLCONST;
+terminal IF, ELSE, FOR,FUNCTION, IN; /* keywords */
+terminal COMMA, LPAR, RPAR, BEGIN, END, ASSIGN, COLON; /* symbols */
+terminal PLUS, MINUS, MULT,DIV; /* calculation operators */
+terminal LEQ, GTQ, EQ, NEQ, LE, GT; /* comparetors */
+terminal AND, OR, NOT; /* boolean operators */
+terminal IDENT, INTCONST, FLOATCONST, BOOLCONST, STRINGCONST, COMMENTS; /* identifiers and variables */
 
 /* Nonterminals (other terms to reach to Terminals). */
-non terminal program, decllist,decl,stmtlist,identlist,stmt,expr,cond;
+non terminal        program;
+non terminal String print_function;
+non terminal 		condition;
+non terminal 		if_condition;
+non terminal 		if_else_condition;
+non terminal 		function_def_section;
+non terminal 		argument;
+non terminal		args;
+non terminal 		call_function;
+non terminal		logic_statement;
+non terminal 		numerical_literal;
+non terminal 		comparison_ops;
+non terminal		math_calculation;
+non terminal 		operand;
+non terminal 		binary_calculation;
+non terminal 		calculation;
+non terminal 		loop_section;
+//non terminal		code_section; compelete this one
+
 
 /* Defining precedence on grammers for terminating all reduce-reduce or shift-reduce problems. */
-precedence left ELSE, UNOP, BINOP, BUNOP, BBINOP;
+precedence left PLUS, MINUS;
+precedence left MULT, DIV;
 
-program   ::=  decllist:d stmtlist:s
-    ;
-decllist  ::=  decl:d decllist:dl
-    // | /* empty */
-    ;
-stmtlist  ::= stmtlist:sl stmt:s
-    // | /* empty */
-        ;
-decl ::=  IDENT:identifier identlist:il
-    ;
-identlist  ::= identlist:il COMMA IDENT:identifier
-    // | /* empty */
-    ;
-stmt ::= BEGIN stmtlist:sl END
-    | IDENT:lhs ASSIGN expr:rhs
-    | IDENT:lhs ASSIGN READ LPAR RPAR
-    | IDENT:lhs ASSIGN READ LPAR STRINGCONST:s RPAR
-    | WRITE LPAR expr:e RPAR
-    | WRITE LPAR STRINGCONST:s RPAR
-    | IF LPAR cond:c RPAR stmt:s
-    | IF LPAR cond:c RPAR stmt:t ELSE stmt:e
-    | WHILE LPAR cond:c RPAR stmt:s
-    ;
-cond ::= BOOLCONST:c
-    | LPAR cond:c RPAR
-    | expr:e1 COMP:op expr:e2
-    | BUNOP cond:c
-    | cond:c1 BBINOP:op cond:c2
-    ;
-expr ::= IDENT:identifier
-    | INTCONST:constant
-    | LPAR expr:e RPAR
-    | BINOP expr:e
-    | expr:e1 BINOP:op expr:e2
-    ;
+
+print_function	::=	IDENT LPAR STRINGCONST:s RPAR
+			;
+
+if_condition	::= IF LPAR logic_statement RPAR BEGIN code_section END
+			;
+
+if_else_condition	::= IF LPAR logic_statement RPAR BEGIN code_section END ELSE BEGIN code_section END
+			;
+			
+condition		::= if_condition
+			|	if_else_condition
+			;
+			
+function_def_section ::= IDENT ASSIGN FUNCTION args BEGIN code_section END
+			;
+			
+argument	::= LPAR IDENT:i COMMA IDENT:j RPAR
+			;
+			
+args	::= argument
+		| args argument
+		;
+		
+loop_section	::= FOR LPAR IDENT:i IN INTCONST COLON IDENT:j RPAR BEGIN code_section END
+				;
+
+call_function ::= IDENT LPAR args RPAR
+				;
+				
+logic_statement ::= numerical_literal comparison_ops numerical_literal
+				| numerical_literal comparison_ops IDENT
+				| IDENT comparison_ops numerical_literal
+				| IDENT comparison_ops IDENT
+				;
+
+numerical_literal ::= INTCONST
+					| FLOATCONST
+					;
+					
+comparison_ops	::= LEQ
+				| GTQ
+				| EQ
+				| NEQ
+				| LE
+				| GT
+				;
+				
+math_calculation ::= operand PLUS operand
+				| operand MINUS operand
+				| operand MULT operand
+				| operand DIV operand
+				| MINUS operand
+				;	
+				
+operand ::= numerical_literal
+		| IDENT
+		;
+
+binary_calculation ::= operand OR operand
+					| operand AND operand
+					| NOT operand
+					;
+calculation ::= math_calculation 
+			| binary_calculation
+			;	
