@@ -12,7 +12,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 %implements sym, minijava.Constants
 %column
 // %standalone
-
+ 
 new_line = \r|\n|\r\n;
 white_space = {new_line} | [ \t\f]
 whitespace = [\n\t]+
