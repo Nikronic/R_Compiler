@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 
 %%
 
-%class lexer
+%class Lexer
 %line
 %cup
 %char
