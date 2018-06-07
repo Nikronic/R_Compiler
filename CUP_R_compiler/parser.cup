@@ -30,7 +30,7 @@ init with {:
   } catch (IOException e) {
     e.printStackTrace();
   } 
-  lexer = new Lexer(f,fis);
+  lexer = new Lexer(fis);
 :};
 scan with {: return lexer.next_token(); :};
 
@@ -60,7 +60,7 @@ non terminal 		operand;
 non terminal 		binary_calculation;
 non terminal 		calculation;
 non terminal 		loop_section;
-//non terminal		code_section; compelete this one
+non terminal		code_section;
 
 
 /* Defining precedence on grammers for terminating all reduce-reduce or shift-reduce problems. */
@@ -68,10 +68,14 @@ precedence left PLUS, MINUS;
 precedence left MULT, DIV;
 
 
-print_function	::=	IDENT LPAR STRINGCONST:s RPAR
+
+print_function	::=	IDENT LPAR STRINGCONST RPAR
 			;
 
 if_condition	::= IF LPAR logic_statement RPAR BEGIN code_section END
+			;
+			
+code_section  ::= BEGIN END
 			;
 
 if_else_condition	::= IF LPAR logic_statement RPAR BEGIN code_section END ELSE BEGIN code_section END
@@ -81,17 +85,13 @@ condition		::= if_condition
 			|	if_else_condition
 			;
 			
-function_def_section ::= IDENT ASSIGN FUNCTION args BEGIN code_section END
+function_def_section ::= IDENT ASSIGN FUNCTION argument BEGIN END
 			;
 			
-argument	::= LPAR IDENT:i COMMA IDENT:j RPAR
+argument	::= LPAR IDENT COMMA IDENT RPAR
 			;
-			
-args	::= argument
-		| args argument
-		;
 		
-loop_section	::= FOR LPAR IDENT:i IN INTCONST COLON IDENT:j RPAR BEGIN code_section END
+loop_section	::= FOR LPAR IDENT IN INTCONST COLON IDENT RPAR BEGIN code_section END
 				;
 
 call_function ::= IDENT LPAR args RPAR
@@ -119,7 +119,7 @@ math_calculation ::= operand PLUS operand
 				| operand MINUS operand
 				| operand MULT operand
 				| operand DIV operand
-				| MINUS operand
+				| operand
 				;	
 				
 operand ::= numerical_literal
@@ -133,3 +133,4 @@ binary_calculation ::= operand OR operand
 calculation ::= math_calculation 
 			| binary_calculation
 			;	
+

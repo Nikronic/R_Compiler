@@ -38,7 +38,7 @@ comments = #.*
 	this(in);
 	    symbolFactory = sf;
     }
-    ComplexSymbolFactory symbolFactory;
+    ComplexSymbolFactory symbolFactory = new ComplexSymbolFactory();
 
   private Symbol symbol(String name, int sym) {
       return symbolFactory.newSymbol(name, sym, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+yylength(),yychar+yylength()));
@@ -92,12 +92,12 @@ comments = #.*
 {identifier} { return symbol("Identifier",IDENT, yytext()); }
 {integer_literal} { return symbol("INTCONST",INTCONST, new Integer(Integer.parseInt(yytext()))); }
 {float_literal} { return symbol("FLOATCONST",FLOATCONST, new Float(Float.parseFloat(yytext()))); }
-{bool_literal} { return symbol("BOOLCONST",BOOLCONST, new Boolean(Boolean.parseBool(yytext()))); }
+{bool_literal} { return symbol("BOOLCONST",BOOLCONST, new Boolean(Boolean.parseBoolean(yytext()))); }
 {string_literal} { return symbol("STRINGCONST",STRINGCONST, yytext()); }
 {comments} { return symbol("Comments",COMMENTS);}
 {whitespace} { }
 
 /* error fallback */
-.|\n {  /* throw new Error("Illegal character <"+ yytext()+">");*/
-		    error("Illegal character <"+ yytext()+">");
-     }
+// .|\n {  /* throw new Error("Illegal character <"+ yytext()+">");*/
+//		    error("Illegal character <"+ yytext()+">");
+ //    }

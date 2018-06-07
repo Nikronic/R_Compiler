@@ -8,51 +8,73 @@ package cup.example;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int READ = 10;
-  public static final int IDENT = 19;
-  public static final int ELSE = 8;
-  public static final int STRINGCONST = 20;
-  public static final int COMP = 16;
-  public static final int WHILE = 9;
-  public static final int END = 6;
-  public static final int INTCONST = 18;
-  public static final int BBINOP = 17;
-  public static final int IF = 7;
-  public static final int WRITE = 11;
-  public static final int BEGIN = 5;
-  public static final int COMMA = 2;
+  public static final int AND = 24;
+  public static final int IDENT = 27;
+  public static final int ELSE = 3;
+  public static final int PLUS = 14;
+  public static final int STRINGCONST = 31;
+  public static final int OR = 25;
+  public static final int GTQ = 19;
+  public static final int IN = 6;
+  public static final int NOT = 26;
+  public static final int END = 11;
+  public static final int INTCONST = 28;
+  public static final int FUNCTION = 5;
+  public static final int IF = 2;
+  public static final int GT = 23;
+  public static final int COLON = 13;
+  public static final int COMMENTS = 32;
+  public static final int LE = 22;
+  public static final int BEGIN = 10;
+  public static final int COMMA = 7;
   public static final int EOF = 0;
+  public static final int MULT = 16;
+  public static final int DIV = 17;
+  public static final int MINUS = 15;
   public static final int error = 1;
-  public static final int BUNOP = 12;
-  public static final int ASSIGN = 13;
-  public static final int RPAR = 4;
-  public static final int BINOP = 14;
-  public static final int LPAR = 3;
-  public static final int BOOLCONST = 21;
-  public static final int UNOP = 15;
+  public static final int EQ = 20;
+  public static final int ASSIGN = 12;
+  public static final int LEQ = 18;
+  public static final int RPAR = 9;
+  public static final int FLOATCONST = 29;
+  public static final int FOR = 4;
+  public static final int NEQ = 21;
+  public static final int LPAR = 8;
+  public static final int BOOLCONST = 30;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
+  "IF",
+  "ELSE",
+  "FOR",
+  "FUNCTION",
+  "IN",
   "COMMA",
   "LPAR",
   "RPAR",
   "BEGIN",
   "END",
-  "IF",
-  "ELSE",
-  "WHILE",
-  "READ",
-  "WRITE",
-  "BUNOP",
   "ASSIGN",
-  "BINOP",
-  "UNOP",
-  "COMP",
-  "BBINOP",
-  "INTCONST",
+  "COLON",
+  "PLUS",
+  "MINUS",
+  "MULT",
+  "DIV",
+  "LEQ",
+  "GTQ",
+  "EQ",
+  "NEQ",
+  "LE",
+  "GT",
+  "AND",
+  "OR",
+  "NOT",
   "IDENT",
+  "INTCONST",
+  "FLOATCONST",
+  "BOOLCONST",
   "STRINGCONST",
-  "BOOLCONST"
+  "COMMENTS"
   };
 }
 
