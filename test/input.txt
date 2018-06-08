@@ -10,5 +10,3 @@ subProgram <- function()
         print("bye")
     }
 }
-
-subProgram()
