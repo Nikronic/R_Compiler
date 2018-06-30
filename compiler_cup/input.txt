@@ -1,0 +1,9 @@
+subProgram <- function(int erf,string e,string h)
+{
+	eh <- 43
+	eh <- "erfan"
+}
+
+var <- 43
+var <- 84
+subProgram(var,"54","var")

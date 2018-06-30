@@ -1,0 +1,268 @@
+/* A simple CUP parser based on JFlex lexer for R language.*/
+/*
+    DEVELOPERS :
+    https://github.com/Nikronic, https://github.com/erfanMhi
+
+*/
+
+package cup.example;
+
+/* importing CUP library */
+import java_cup.runtime.*;
+import cup.example.Lexer;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.*;
+
+/* Connect this parser to a scanner! */
+parser code {:
+  protected Lexer lexer;
+:}
+
+action code {:
+	Map<String, Object> symTable = new HashMap<>();
+	Map<String, List<Object>> funcTable = new HashMap<>();
+
+	private void assignment(String ident,Object o){
+		if (!symTable.containsKey(ident)) {
+			symTable.put(ident,o);
+			System.out.println( ident + " variable Assigned : " + o);
+		} else {
+			if(symTable.get(ident).getClass().getName().equals(o.getClass().getName())) {
+				symTable.put(ident,o);
+				System.out.println( ident + " variable Assigned : " + o);
+			} else {
+				System.out.println("Semantic Error:: Variable " + ident + " with " + symTable.get(ident).getClass().getName() + " Assigned To " + o.getClass().getName());
+			}
+		}
+	}
+
+	private void callFunction(String ident,List<Object> l) {
+		if(!funcTable.containsKey(ident)) {
+			System.out.println("Semantic Error:: There is no function called " + ident);
+		} else {
+//			System.out.println("Identifier " + ident);
+			if(funcTable.get(ident).size() == l.size()) {
+				for (int i = 0 ; i < funcTable.get(ident).size() ; i++) {
+//					System.out.print(funcTable.get(ident).get(i) + " =? ");
+//					System.out.println(l.get(i));
+					if(!funcTable.get(ident).get(i).equals(l.get(i))) {
+						System.out.println("Semantic Error:: Arguments type of function " + ident + " that you called, didn't match to real function");
+						break;
+					}
+				}
+			} else {
+				System.out.println("Semantic Error:: " + l.size() + " arguments passed to the function but function " + ident + " just accept " + funcTable.get(ident).size() + " arguments");
+			}
+
+		}
+
+
+	}
+
+	private List addNewArg(List l,Object var) {
+		if(l == null){
+			l = new ArrayList<Object>();
+		}
+		l.add(var);
+		return l;
+	}
+
+	private Object getIdentValue(String ident) {
+		if(!symTable.containsKey(ident)) {
+			System.out.println("There is no variable called " + ident);
+			return 0;
+		} else {
+ 		try {
+			return new Integer((int)symTable.get(ident));
+		} catch(Exception e) {
+			
+		}
+		return symTable.get(ident);
+		}
+
+		
+	}
+
+	private void show() {
+		for(String i : funcTable.keySet()) {
+			System.out.println(i + "(");
+			for(Object j : funcTable.get(i)) {
+				System.out.print(j + ",");
+			}
+			System.out.println(")");			
+
+		}
+
+	}
+
+:};
+
+/* define how to connect to the scanner! */
+init with {:
+  ComplexSymbolFactory f = new ComplexSymbolFactory();
+  symbolFactory = f;
+  File file = new File("input.txt");
+  FileInputStream fis = null;
+  try {
+    fis = new FileInputStream(file);
+  } catch (IOException e) {
+    e.printStackTrace();
+  } 
+  lexer = new Lexer(f,fis);
+:};
+scan with {: return lexer.next_token(); :};
+/* Terminals (tokens returned by the scanner). */
+terminal IF, ELSE, FOR,FUNCTION, IN; /* keywords */
+terminal COMMA, LPAR, RPAR, BEGIN, END, ASSIGN, COLON; /* symbols */
+terminal PLUS, MINUS, MULT,DIV; /* calculation operators */
+terminal LEQ, GTQ, EQ, NEQ, LE, GT; /* comparetors */
+terminal AND, OR, NOT; /* boolean operators */
+terminal String IDENT;
+terminal Integer INTCONST;
+terminal Float FLOATCONST;
+terminal Boolean BOOLCONST;
+terminal String STRINGCONST;
+terminal INT;
+terminal FLOAT;
+terminal BOOL;
+terminal STRING;
+terminal COMMENTS;  /*identifiers and variables */
+
+/* Nonterminals (other terms to reach to Terminals). */
+non terminal        program,program_util;
+non terminal 		if_condition;
+non terminal 		else_condition;
+non terminal 		function_def_section;
+non terminal List<Object>		call_argument,call_argument_next;
+non terminal List<Object> argument_next,argument;
+non terminal 		call_function;
+non terminal		logic_statement;
+non terminal Integer		numerical_literal;
+non terminal 		comparison_ops;
+non terminal Integer		math_calculation;
+non terminal Integer		numerical_op;
+non terminal Boolean		binary_calculation;
+non terminal Object	    calculation;
+non terminal 		loop_section;
+non terminal		code_section;
+non terminal        command_list;
+non terminal        op_assignment;
+non terminal        int_literal;
+non terminal Object      operand;
+
+
+precedence left PLUS, MINUS;
+precedence left MULT, DIV;
+
+
+program ::= program_util  {: System.out.println("Code Root Found");  :}
+		;
+
+program_util ::= function_def_section program_util 
+				| code_section
+			;
+			
+function_def_section ::= IDENT:n ASSIGN FUNCTION argument:args BEGIN code_section END {: System.out.println("Function Implementation Found " + n); Collections.reverse(args); funcTable.put(n,args);  :}
+			;
+			
+argument	::= LPAR INT IDENT argument_next:args {: RESULT = addNewArg(args,new Integer(0).getClass().getName()); :}
+			| LPAR STRING IDENT argument_next:args {:  RESULT = addNewArg(args,new String("").getClass().getName()); :}
+			| LPAR FLOAT IDENT argument_next:args {:  RESULT = addNewArg(args,new Float(0).getClass().getName()); :}
+			| LPAR BOOL IDENT argument_next:args	{:  RESULT = addNewArg(args,new Boolean(false).getClass().getName()); :}
+			| LPAR IDENT:ident IDENT argument_next:args	{:  RESULT = addNewArg(args,ident); :}
+			| LPAR RPAR {: RESULT = new ArrayList<Object>(); :}
+			;
+			
+argument_next ::= COMMA INT IDENT argument_next:args {: RESULT = addNewArg(args,new Integer(0).getClass().getName()); :}
+			| COMMA STRING IDENT argument_next:args {: RESULT = addNewArg(args,new String("").getClass().getName()); :}
+			| COMMA FLOAT IDENT argument_next:args {: RESULT = addNewArg(args,new Float(0).getClass().getName()); :}
+			| COMMA BOOL IDENT argument_next:args {: RESULT = addNewArg(args,new Boolean(false).getClass().getName()); :}	
+			| COMMA IDENT:ident IDENT argument_next:args {: RESULT = addNewArg(args,ident); :}	
+			| RPAR
+			;
+			
+code_section  ::= op_assignment code_section
+			| call_function code_section
+			| if_condition code_section
+			| loop_section code_section	
+			|
+			;
+			
+op_assignment ::= IDENT:v ASSIGN calculation:ex  {: this.assignment(v,ex);:}
+				;
+
+/* function_call	::=	IDENT LPAR STRINGCONST RPAR
+			; */
+
+if_condition	::= IF LPAR logic_statement RPAR BEGIN code_section END else_condition {: System.out.println("If Entry Found"); :}
+			;
+			
+
+else_condition	::= ELSE BEGIN code_section END  {: System.out.println("Else Entry Found"); :}
+			| /* empty */
+			;
+			
+loop_section	::= FOR LPAR IDENT IN int_literal COLON int_literal RPAR BEGIN code_section END {: System.out.println("Loop Entry Found"); :}
+				; 
+
+call_function ::= IDENT:ident call_argument:args {: Collections.reverse(args); this.callFunction(ident,args);:}
+				;
+				
+call_argument	::= LPAR operand:o call_argument_next:args {: RESULT = addNewArg(args, o.getClass().getName()); :}
+			| LPAR RPAR {: RESULT = new ArrayList<Object>(); :}
+			;
+			
+call_argument_next ::= COMMA operand:o call_argument_next:args {: RESULT = addNewArg(args, o.getClass().getName()); :}
+			| RPAR
+			;
+
+
+numerical_literal ::= INTCONST:e {: RESULT = new Integer(e.intValue());  :}
+					| FLOATCONST:e {: RESULT = new Integer(e.intValue()); :}
+					;
+
+int_literal ::= INTCONST:e 
+			| IDENT
+			;
+
+numerical_op ::= numerical_literal:e {: RESULT = new Integer(e.intValue()); :}
+			| IDENT:ident {: RESULT = (int)getIdentValue(ident); :}
+		;
+	
+operand ::= numerical_literal:e {: RESULT = e; :}
+			| STRINGCONST:s {: RESULT = s; :}
+			| IDENT:ident {: RESULT = getIdentValue(ident); :}
+			;
+		
+logic_statement ::= numerical_op comparison_ops numerical_op
+				;
+					
+comparison_ops	::= LEQ
+				| GTQ
+				| EQ
+				| NEQ
+				| LE
+				| GT
+				;
+				
+math_calculation ::= numerical_op:e1 PLUS math_calculation:e2 {: RESULT = new Integer(e1 + e2); :}
+				| numerical_op:e1 MINUS math_calculation:e2 {: RESULT = new Integer(e1 - e2); :}
+				| numerical_op:e1 MULT math_calculation:e2 {: RESULT = new Integer(e1 * e2); :}
+				| numerical_op:e1 DIV math_calculation:e2 {: RESULT = new Integer(e1 / e2); :}
+				| numerical_op:e {: RESULT = new Integer(e); :}
+				;	
+				
+
+
+binary_calculation ::= BOOLCONST:b1 OR binary_calculation:b2 {: RESULT = new Boolean(b1 || b2); :} 
+					| BOOLCONST:b1 AND binary_calculation:b2 {: RESULT = new Boolean(b1 && b2); :} 
+					| NOT binary_calculation:b {: RESULT = new Boolean(!b); :} 
+					| BOOLCONST:b {: RESULT = new Boolean(b); :} 
+					;
+calculation ::= math_calculation:e {: RESULT = e; :} 
+			| binary_calculation:e {: RESULT = e; :}
+			| STRINGCONST:s {: RESULT = s; :}
+			;	
+			
